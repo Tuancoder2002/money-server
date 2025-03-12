@@ -14,3 +14,4 @@ model User {
   gender   Boolean @default(true)
   password String  @db.VarChar(255)
 }
+
