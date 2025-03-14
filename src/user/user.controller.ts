@@ -6,10 +6,12 @@ import {
   Param,
   UnauthorizedException,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
+import { log } from 'console';
 
 interface JwtPayload {
   userId: number; // Hoặc string, tùy thuộc vào cách bạn lưu trữ userId
@@ -22,7 +24,6 @@ export class UserController {
   @Get('me') // Endpoint để lấy thông tin người dùng hiện tại
   async getMe(@Req() req: Request) {
     const token = req.headers['authorization']?.split(' ')[1]; // Lấy token từ header
-    console.log('Token:', token);
   
     if (!token) {
       throw new UnauthorizedException('Token is required');
@@ -38,21 +39,30 @@ export class UserController {
   
       const userId = Number(decoded.userId); // Lấy userId từ token
   
-      console.log('Decoded User ID:', userId); // Log userId
+      // console.log('Decoded User ID:', userId); // Log userId
   
       if (isNaN(userId)) {
         throw new UnauthorizedException('Invalid user ID');
       }
   
-      const user = await this.userService.findUserById(userId); // Gọi service để lấy thông tin người dùng
+      const user = await this.userService.findUserById(userId);
+       // Gọi service để lấy thông tin người dùng
+      //  console.log("user", user)
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
   
       return user; // Trả về thông tin người dùng
     } catch (error) {
-      console.error('Error decoding token:', error); // Log lỗi
-      throw new UnauthorizedException('Invalid token');
+      if (error.name == 'JsonWebTokenError') {
+        throw new BadRequestException('err_auth_invalid_token') 
+      }
+
+      if (error.message == "err_auth_invalid_token") {
+        throw new BadRequestException(error.message)
+      }
+
+      throw new BadRequestException('err_auth_unknown_error')
     }
   }
 
