@@ -8,10 +8,31 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  gender   Boolean @default(true)
-  password String  @db.VarChar(255)
+  id        Int       @id @default(autoincrement())
+  username  String    @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at")
+  wallets   Wallet[]  @relation("UserWallets")
+}
+
+model Wallet {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  name      String    @db.VarChar(255)
+  balance   Float     @default(0.00)
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation("UserWallets", fields: [userId], references: [id])
+  transactions Transaction[] @relation("WalletTransactions")
+}
+
+model Transaction {
+  id                Int       @id @default(autoincrement())
+  walletId         Int       @map("wallet_id")
+  transactionType   String    // Có thể sử dụng Enum nếu cần
+  amount            Float
+  description       String?   @db.VarChar(255)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  wallet            Wallet    @relation("WalletTransactions", fields: [walletId], references: [id])
 }
 

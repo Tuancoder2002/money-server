@@ -7,12 +7,13 @@ import * as jwt from 'jsonwebtoken';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  async registerUser(userData: { email: string; name: string; gender: boolean; password: string }): Promise<string> {
+  async registerUser(userData: { username: string; email: string; password: string }): Promise<string> {
     try {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       await this.prisma.user.create({
         data: {
-          ...userData,
+          username: userData.username, 
+          email: userData.email,
           password: hashedPassword,
         },
       });
@@ -28,20 +29,22 @@ export class AuthService {
       const user = await this.prisma.user.findUnique({
         where: { email: loginData.email },
       });
-
+  
       if (!user) {
         return 'User not found';
       }
-
+  
       const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
       if (!isPasswordValid) {
         return 'Invalid password';
       }
-
+  
+      console.log("User ID:", user.id); // Log userId
+  
       const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
         expiresIn: '10m',
       });
-
+  
       return { token, message: 'Login successful' };
     } catch (error) {
       console.log(error);

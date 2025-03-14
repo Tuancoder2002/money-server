@@ -5,17 +5,17 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Post('register')
+  async registerUser(
+    @Body() userData: { username: string; email: string; password: string }, // Cập nhật ở đây
+  ): Promise<string> {
+    return this.authService.registerUser(userData);
+  }
+
   @Post('login')
   async loginUser(
     @Body() loginData: { email: string; password: string },
   ): Promise<{ token: string; message: string } | string> {
     return this.authService.loginUser(loginData);
-  }
-
-  @Post('register')
-  async registerUser(
-    @Body() userData: { email: string; name: string; gender: boolean; password: string },
-  ): Promise<string> {
-    return this.authService.registerUser(userData);
   }
 }
