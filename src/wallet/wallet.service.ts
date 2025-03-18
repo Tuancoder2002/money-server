@@ -31,5 +31,21 @@ export class WalletService {
       throw new Error('Error fetching wallets');
     }
   }
+
+  async updateWalletBalance(walletId: number, amount: number, transactionType: string): Promise<void> {
+    try {
+      await this.prisma.wallet.update({
+        where: { id: walletId },
+        data: {
+          balance: {
+            increment: transactionType === 'DEPOSIT' ? amount : -amount,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error updating wallet balance:", error);
+      throw new Error('Error updating wallet balance');
+    }
+  }
   
 }
