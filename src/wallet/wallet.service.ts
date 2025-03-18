@@ -5,12 +5,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WalletService {
   constructor(private prisma: PrismaService) {}
 
-  async createWallet(userId: number, name: string): Promise<string> {
+  async createWallet(userId: number, name: string, balance: number): Promise<string> {
     try {
       await this.prisma.wallet.create({
         data: {
-          userId: userId, // Sửa từ user_id thành userId
+          userId: userId, 
           name: name,
+          balance: balance,
         },
       });
       return 'Wallet created successfully!';

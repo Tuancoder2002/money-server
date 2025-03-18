@@ -7,9 +7,9 @@ export class WalletController {
 
   @Post('create')
   async createWallet(
-    @Body() walletData: { userId: number; name: string },
+    @Body() walletData: { userId: number; name: string, balance: number},
   ): Promise<string> {
-    return this.walletService.createWallet(walletData.userId, walletData.name);
+    return this.walletService.createWallet(walletData.userId, walletData.name, walletData.balance);
   }
 
   @Get('user/:userId')

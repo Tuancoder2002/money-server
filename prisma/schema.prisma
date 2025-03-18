@@ -28,11 +28,15 @@ model Wallet {
 
 model Transaction {
   id                Int       @id @default(autoincrement())
-  walletId         Int       @map("wallet_id")
-  transactionType   String    // Có thể sử dụng Enum nếu cần
+  walletId          Int       @map("wallet_id")
+  transactionType   TransactionType    
   amount            Float
   description       String?   @db.VarChar(255)
-  createdAt        DateTime  @default(now()) @map("created_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
   wallet            Wallet    @relation("WalletTransactions", fields: [walletId], references: [id])
 }
 
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+}
