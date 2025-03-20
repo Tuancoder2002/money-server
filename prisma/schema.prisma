@@ -29,14 +29,22 @@ model Wallet {
 model Transaction {
   id                Int       @id @default(autoincrement())
   walletId          Int       @map("wallet_id")
-  transactionType   TransactionType    
+  categoryId        Int       @map("category_id")
   amount            Float
   description       String?   @db.VarChar(255)
   createdAt         DateTime  @default(now()) @map("created_at")
   wallet            Wallet    @relation("WalletTransactions", fields: [walletId], references: [id])
+  category          Category  @relation(fields: [categoryId], references: [id])
 }
 
-enum TransactionType {
-  DEPOSIT
-  WITHDRAW
+model Category {
+  id                Int           @id @default(autoincrement())
+  name              String        @db.VarChar(255)
+  categoryType     CategoryType 
+  transactions      Transaction[] @relation
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
 }
