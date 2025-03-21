@@ -69,6 +69,7 @@ export class TransactionService {
       });
 
       return transactions.map(transaction => ({
+        name: transaction.category.name,
         categoryType: transaction.category.categoryType,
         amount: transaction.amount,
         description: transaction.description,
