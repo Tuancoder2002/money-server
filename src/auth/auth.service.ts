@@ -25,33 +25,6 @@ export class AuthService {
         },
       });
 
-      // Thêm các danh mục mặc định
-      const defaultCategories = [
-        { name: 'Food', categoryType: CategoryType.EXPENSE },
-        { name: 'Transport', categoryType: CategoryType.EXPENSE },
-        { name: 'Health', categoryType: CategoryType.EXPENSE },
-        { name: 'Entertainment', categoryType: CategoryType.EXPENSE },
-        { name: 'Shopping', categoryType: CategoryType.EXPENSE }, // Mua sắm
-        { name: 'Utilities', categoryType: CategoryType.EXPENSE }, // Tiền điện, nước, internet
-        { name: 'Education', categoryType: CategoryType.EXPENSE }, // Học phí
-        { name: 'Travel', categoryType: CategoryType.EXPENSE }, // Du lịch
-        { name: 'Dining Out', categoryType: CategoryType.EXPENSE }, // Ăn uống bên ngoài
-        { name: 'Salary', categoryType: CategoryType.INCOME },
-        { name: 'Bill', categoryType: CategoryType.INCOME },
-        { name: 'Bonus', categoryType: CategoryType.INCOME }, // Tiền thưởng
-        { name: 'Freelance', categoryType: CategoryType.INCOME }, // Thu nhập từ công việc tự do
-        { name: 'Investments', categoryType: CategoryType.INCOME }, // Lợi nhuận từ đầu tư
-      ];
-
-      for (const category of defaultCategories) {
-        await this.prisma.category.create({
-          data: {
-            name: category.name,
-            categoryType: category.categoryType,
-          },
-        });
-      }
-
       return 'User registered successfully with default categories!';
     } catch (error) {
       console.log(error);

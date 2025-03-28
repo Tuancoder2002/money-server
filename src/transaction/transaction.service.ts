@@ -7,9 +7,14 @@ import { WalletService } from '../wallet/wallet.service';
 export class TransactionService {
   constructor(private prisma: PrismaService, private walletService: WalletService) {}
 
-  async createTransaction(walletId: number, amount: number, description: string, categoryId: number): Promise<string> {
+  async createTransaction(walletId: number, amount: number, description: string, categoryId: number, date: Date): Promise<string> {
     try {
-      // Lấy thông tin loại danh mục
+   
+      console.log("check date",date)
+      if (!amount || isNaN(amount)) {
+        throw new Error('Invalid amount. Amount must be a valid number.');
+      }
+
       const category = await this.prisma.category.findUnique({
         where: { id: categoryId },
       });
@@ -25,6 +30,7 @@ export class TransactionService {
           amount: amount,
           description: description,
           category: { connect: { id: categoryId } },
+          createdAt: date || new Date(),
         },
       });
 
@@ -53,7 +59,45 @@ export class TransactionService {
   async getTransactionsWithCategoryTypeForCurrentMonth(walletId: number): Promise<any[]> {
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+  
+    try {
+      const transactions = await this.prisma.transaction.findMany({
+        where: {
+          walletId: walletId,
+          createdAt: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+          category: {
+            categoryType: 'EXPENSE', // Lọc chỉ các danh mục có categoryType là EXPENSE
+          },
+        },
+        include: {
+          category: true, // Bao gồm thông tin về danh mục
+        },
+        orderBy: {
+          createdAt: 'asc', // Sắp xếp theo ngày tăng dần
+        },
+      });
+  
+      return transactions.map(transaction => ({
+        name: transaction.category.name,
+        categoryType: transaction.category.categoryType,
+        amount: transaction.amount,
+        icon: transaction.category.icon,
+        description: transaction.description,
+        date: transaction.createdAt,
+      }));
+    } catch (error) {
+      console.error("Error fetching transactions with category type for current month:", error);
+      throw new Error('Error fetching transactions with category type for current month');
+    }
+  }
 
+  async getAllTransactionsForCurrentMonth(walletId: number): Promise<any[]> {
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+  
     try {
       const transactions = await this.prisma.transaction.findMany({
         where: {
@@ -66,17 +110,22 @@ export class TransactionService {
         include: {
           category: true, // Bao gồm thông tin về danh mục
         },
+        orderBy: {
+          createdAt: 'asc', // Sắp xếp theo ngày tăng dần
+        },
       });
-
+  
       return transactions.map(transaction => ({
         name: transaction.category.name,
         categoryType: transaction.category.categoryType,
         amount: transaction.amount,
+        icon: transaction.category.icon,
         description: transaction.description,
+        date: transaction.createdAt,
       }));
     } catch (error) {
-      console.error("Error fetching transactions with category type for current month:", error);
-      throw new Error('Error fetching transactions with category type for current month');
+      console.error("Error fetching all transactions for current month:", error);
+      throw new Error('Error fetching all transactions for current month');
     }
   }
 

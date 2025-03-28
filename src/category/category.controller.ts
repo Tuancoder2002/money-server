@@ -6,11 +6,6 @@ import { CategoryType } from '@prisma/client'; // Import CategoryType từ Prism
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post('create')
-  async createCategory(@Body() categoryData: { name: string, categoryType: CategoryType }): Promise<string> {
-    return this.categoryService.createCategory(categoryData.name, categoryData.categoryType);
-  }
-
   @Get()
   async getAllCategories() {
     return this.categoryService.getAllCategories();

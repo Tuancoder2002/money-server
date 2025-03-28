@@ -38,10 +38,11 @@ model Transaction {
 }
 
 model Category {
-  id                Int           @id @default(autoincrement())
-  name              String        @db.VarChar(255)
-  categoryType      CategoryType 
-  transactions      Transaction[] @relation
+  id           Int           @id @default(autoincrement())
+  name         String        @unique @db.VarChar(255) // Đánh dấu name là duy nhất
+  categoryType CategoryType
+  icon         String?       @db.VarChar(255)
+  transactions Transaction[] @relation
 }
 
 enum CategoryType {
